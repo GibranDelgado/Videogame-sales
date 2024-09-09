@@ -1,0 +1,551 @@
+--1. Top best seller of all time
+WITH
+Temp1 AS(
+SELECT
+	*
+FROM(
+	SELECT
+		*,
+		DENSE_RANK() OVER(ORDER BY Game_sales DESC) Ranking
+	FROM(
+		SELECT
+			Name AS 'Game',
+			SUM(Global_Sales) Game_sales
+		FROM vgsales
+		GROUP BY Name
+	)
+)
+WHERE Ranking<=10
+),
+Temp2 AS(
+SELECT
+	*
+FROM(
+	SELECT
+		*, 
+		DENSE_RANK() OVER(ORDER BY Platform_Sales DESC) Ranking
+	FROM(
+		SELECT 
+			Platform, 
+			SUM(Global_Sales) Platform_Sales
+		FROM vgsales
+		GROUP BY Platform
+	)
+)
+WHERE Ranking<=10),
+Temp3 AS(
+SELECT
+	*
+FROM(
+	SELECT
+		*, 
+		DENSE_RANK() OVER(ORDER BY Genre_Sales DESC) Ranking
+	FROM(
+		SELECT 
+			Genre, 
+			SUM(Global_Sales) Genre_Sales
+		FROM vgsales
+		GROUP BY Genre
+	)
+)
+WHERE Ranking<=10),
+Temp4 AS(
+SELECT
+	*
+FROM(
+	SELECT
+		*, 
+		DENSE_RANK() OVER(ORDER BY Publisher_Sales DESC) Ranking
+	FROM(
+		SELECT 
+			Publisher, 
+			SUM(Global_Sales) Publisher_Sales
+		FROM vgsales
+		GROUP BY Publisher
+	)
+)
+WHERE Ranking<=10)
+SELECT
+	T1.Game, ROUND(T1.Game_Sales,2) Game_Sales, 
+	T2.Platform, ROUND(T2.Platform_Sales,2) Platform_Sales, 
+	T3.Genre, ROUND(T3.Genre_Sales,2) Genre_Sales, 
+	T4.Publisher, ROUND(T4.Publisher_Sales,2) Publisher_Sales
+FROM Temp1 T1
+INNER JOIN Temp2 T2
+ON T1.Ranking = T2.Ranking
+INNER JOIN Temp3 T3
+ON T2.Ranking = T3.Ranking
+INNER JOIN Temp4 T4
+ON T3.Ranking = T4.Ranking
+
+--2. Top most releases
+WITH
+TEMP1 AS(
+	SELECT
+		*
+	FROM(
+		SELECT
+			*,
+			DENSE_RANK() OVER(ORDER BY Platform_count DESC) Ranking
+		FROM(
+			SELECT
+				Platform,
+				COUNT(1) Platform_count
+			FROM vgsales
+			GROUP BY Platform
+		)
+	)
+	WHERE Ranking<=10
+),
+TEMP2 AS(
+	SELECT
+		*
+	FROM(
+		SELECT
+			*,
+			DENSE_RANK() OVER(ORDER BY Genre_count DESC) Ranking
+		FROM(
+			SELECT
+				Genre,
+				COUNT(1) Genre_count
+			FROM vgsales
+			GROUP BY Genre
+		)
+	)
+	WHERE Ranking<=10
+),
+TEMP3 AS(
+	SELECT
+		*
+	FROM(
+		SELECT
+			*,
+			DENSE_RANK() OVER(ORDER BY Publisher_count DESC) Ranking
+		FROM(
+			SELECT
+				Publisher,
+				COUNT(1) Publisher_count
+			FROM vgsales
+			GROUP BY Publisher
+		)
+	)
+	WHERE Ranking<=10
+)
+SELECT
+	T1.Platform, T1.Platform_count,
+	T2.Genre, T2.Genre_count,
+	T3.Publisher, T3.Publisher_count
+FROM TEMP1 T1
+INNER JOIN TEMP2 T2
+ON T1.Ranking = T2.Ranking
+INNER JOIN Temp3 T3
+ON T2.Ranking = T3.Ranking
+
+--3. Most selling genres per region 
+WITH
+NorthAmerica AS(
+SELECT
+	*
+FROM(
+	SELECT
+		*,
+		DENSE_RANK() OVER(ORDER BY NorthAmerica_Sales DESC) Ranking
+	FROM(
+		SELECT
+			Genre AS NA_Genre, 
+			SUM(NA_Sales) NorthAmerica_Sales,
+			SUM(NA_Sales)/(SELECT SUM(NA_Sales) FROM vgsales) NorthAmerica_Sales_Percentage
+		FROM vgsales
+		GROUP BY Genre
+	)
+)
+WHERE Ranking<=5),
+Europe AS(
+SELECT
+	*
+FROM(
+	SELECT
+		*,
+		DENSE_RANK() OVER(ORDER BY Europe_Sales DESC) Ranking
+	FROM(
+		SELECT
+			Genre AS EU_Genre, 
+			SUM(EU_Sales) Europe_Sales,
+			SUM(EU_Sales)/(SELECT SUM(EU_Sales) FROM vgsales) Europe_Sales_Percentage
+		FROM vgsales
+		GROUP BY Genre
+	)
+)
+WHERE Ranking<=5),
+Japan AS(
+SELECT
+	*
+FROM(
+	SELECT
+		*,
+		DENSE_RANK() OVER(ORDER BY Japan_Sales DESC) Ranking
+	FROM(
+		SELECT
+			Genre AS JP_Genre, 
+			SUM(JP_Sales) Japan_Sales,
+			SUM(JP_Sales)/(SELECT SUM(JP_Sales) FROM vgsales) Japan_Sales_Percentage
+		FROM vgsales
+		GROUP BY Genre
+	)
+)
+WHERE Ranking<=5),
+Other_World AS(
+SELECT
+	*
+FROM(
+	SELECT
+		*,
+		DENSE_RANK() OVER(ORDER BY Other_World_Sales DESC) Ranking
+	FROM(
+		SELECT
+			Genre AS OW_Genre, 
+			SUM(Other_Sales) Other_World_Sales,
+			SUM(Other_Sales)/(SELECT SUM(Other_Sales) FROM vgsales) Other_World_Sales_Percentage
+		FROM vgsales
+		GROUP BY Genre
+	)
+)
+WHERE Ranking<=5)
+SELECT
+	IIF(NA.NA_Genre='Misc','Miscellaneous',NA.NA_Genre) NA_Genre, ROUND(NA.NorthAmerica_Sales_Percentage,4) NorthAmerica_Sales_Percentage,
+	IIF(EU.EU_Genre='Misc','Miscellaneous',EU.EU_Genre) EU_Genre, ROUND(EU.Europe_Sales_Percentage,4) Europe_Sales_Percentage,
+	IIF(JP.JP_Genre='Misc','Miscellaneous',JP.JP_Genre) JP_Genre, ROUND(JP.Japan_Sales_Percentage,4) Japan_Sales_Percentage,
+	IIF(OW.OW_Genre='Misc','Miscellaneous',OW.OW_Genre) OW_Genre, ROUND(OW.Other_World_Sales_Percentage,4) Other_World_Sales_Percentage
+FROM NorthAmerica NA
+INNER JOIN Europe EU
+ON NA.Ranking = EU.Ranking
+INNER JOIN Japan JP
+ON EU.Ranking = JP.Ranking
+INNER JOIN Other_World OW
+ON JP.Ranking = OW.Ranking
+
+--4. Top best selling games per region
+WITH
+NorthAmerica AS(
+	SELECT
+		*
+	FROM(
+		SELECT
+			*,
+			DENSE_RANK() OVER(ORDER BY NA_Sales DESC) Ranking
+		FROM(
+			SELECT DISTINCT
+				Name Games_NorthAmerica,
+				Genre Genres_NorthAmerica,
+				SUM(NA_Sales) OVER(PARTITION BY Name, Genre) NA_Sales
+			FROM vgsales
+		)
+	)
+	WHERE Ranking<=10
+),
+Europe AS(
+	SELECT
+		*
+	FROM(
+		SELECT
+			*,
+			DENSE_RANK() OVER(ORDER BY EU_Sales DESC) Ranking
+		FROM(
+			SELECT DISTINCT
+				Name Games_Europe,
+				Genre Genres_Europe,
+				SUM(EU_Sales) OVER(PARTITION BY Name, Genre) EU_Sales
+			FROM vgsales
+		)
+	)
+	WHERE Ranking<=10
+),
+Japan AS(
+	SELECT
+		*
+	FROM(
+		SELECT
+			*,
+			DENSE_RANK() OVER(ORDER BY JP_Sales DESC) Ranking
+		FROM(
+			SELECT DISTINCT
+				Name Games_Japan,
+				Genre Genres_Japan,
+				SUM(JP_Sales) OVER(PARTITION BY Name, Genre) JP_Sales
+			FROM vgsales
+		)
+	)
+	WHERE Ranking<=10
+),
+Other_world AS(
+	SELECT
+		*
+	FROM(
+		SELECT
+			*,
+			DENSE_RANK() OVER(ORDER BY Other_Sales DESC) Ranking
+		FROM(
+			SELECT DISTINCT
+				Name Games_Other_world,
+				Genre Genres_Other_World,
+				SUM(Other_Sales) OVER(PARTITION BY Name, Genre) Other_Sales
+			FROM vgsales
+		)
+	)
+	WHERE Ranking<=10
+)
+SELECT
+	N.Games_NorthAmerica, N.Genres_NorthAmerica, ROUND(NA_Sales,2) NA_Sales,
+	E.Games_Europe, E.Genres_Europe, ROUND(EU_Sales,2) EU_Sales,
+	J.Games_Japan, J.Genres_Japan, ROUND(JP_Sales,2) JP_Sales,
+	O.Games_Other_world, O.Genres_Other_world, ROUND(O.Other_Sales,2) Other_Sales
+FROM NorthAmerica N
+INNER JOIN Europe E
+ON N.Ranking = E.Ranking
+INNER JOIN Japan J
+ON E.Ranking = J.Ranking
+INNER JOIN Other_world O
+ON J.Ranking = O.Ranking
+
+--5. Top best selling platforms per region
+WITH
+NorthAmerica AS(
+	SELECT
+		*
+	FROM(
+		SELECT
+			*,
+			DENSE_RANK() OVER(ORDER BY NorthAmerica_platform_sales DESC) Ranking
+		FROM(
+			SELECT
+				Platform Platforms_NorthAmerica,
+				SUM(NA_Sales) NorthAmerica_platform_sales
+			FROM vgsales
+			GROUP BY Platform
+		)
+	)
+	WHERE Ranking<=10
+),
+Europe AS(
+	SELECT
+		*
+	FROM(
+		SELECT
+			*,
+			DENSE_RANK() OVER(ORDER BY Europe_platform_sales DESC) Ranking
+		FROM(
+			SELECT
+				Platform Platforms_Europe,
+				SUM(EU_Sales) Europe_platform_sales
+			FROM vgsales
+			GROUP BY Platform
+		)
+	)
+	WHERE Ranking<=10
+),
+Japan AS(
+	SELECT
+		*
+	FROM(
+		SELECT
+			*,
+			DENSE_RANK() OVER(ORDER BY Japan_platform_sales DESC) Ranking
+		FROM(
+			SELECT
+				Platform Platforms_Japan,
+				SUM(JP_Sales) Japan_platform_sales
+			FROM vgsales
+			GROUP BY Platform
+		)
+	)
+	WHERE Ranking<=10
+),
+Other_World AS(
+	SELECT
+		*
+	FROM(
+		SELECT
+			*,
+			DENSE_RANK() OVER(ORDER BY Other_world_platform_sales DESC) Ranking
+		FROM(
+			SELECT
+				Platform Platforms_Other_World,
+				SUM(Other_Sales) Other_world_platform_sales
+			FROM vgsales
+			GROUP BY Platform
+		)
+	)
+	WHERE Ranking<=10
+)
+SELECT
+	NA.Platforms_NorthAmerica, ROUND(NA.NorthAmerica_platform_sales,2) NorthAmerica_platform_sales,
+	EU.Platforms_Europe, ROUND(EU.Europe_platform_sales,2) Europe_platform_sales,
+	JP.Platforms_Japan, ROUND(JP.Japan_platform_sales,2) Japan_platform_sales,
+	OW.Platforms_Other_World, ROUND(OW.Other_world_platform_sales,2) Other_world_platform_sales
+FROM NorthAmerica NA
+INNER JOIN Europe EU
+ON NA.Ranking = EU.Ranking
+INNER JOIN Japan JP
+ON EU.Ranking = JP.Ranking
+INNER JOIN Other_World OW
+ON JP.Ranking = OW.Ranking
+
+--6. Best year and platform of each publisher
+WITH
+Publisher_best_years AS(
+SELECT
+	*
+FROM(
+SELECT
+	Publisher,
+	Year,
+	ROUND(SUM(Global_sales),2) Yearly_sales
+FROM vgsales
+WHERE Publisher IN (SELECT Publisher FROM vgsales GROUP BY Publisher ORDER BY SUM(Global_sales) DESC LIMIT 10)
+AND Year IS NOT NULL
+GROUP BY Publisher, Year
+)
+GROUP BY Publisher
+HAVING Yearly_sales = MAX(Yearly_sales)
+),
+Publisher_best_platforms AS(
+SELECT
+	*
+FROM(
+	SELECT
+		Publisher,
+		Platform,
+		ROUND(SUM(Global_sales),2) Publisher_platform_sales
+	FROM vgsales
+	WHERE Publisher IN (SELECT Publisher FROM vgsales GROUP BY Publisher ORDER BY SUM(Global_sales) DESC LIMIT 10)
+	AND Year IS NOT NULL 
+	GROUP BY Publisher, Platform
+)
+GROUP BY Publisher
+HAVING Publisher_platform_sales = MAX(Publisher_platform_sales)
+)
+SELECT
+	PBY.*,
+	PBP.Platform,
+	PBP.Publisher_platform_sales
+FROM Publisher_best_years PBY
+INNER JOIN Publisher_best_platforms PBP
+ON PBY.Publisher = PBP.Publisher
+
+--7. Sales by genre of each publisher
+SELECT
+	Publisher,
+	Genre,
+	ROUND(SUM(Global_sales),2) Sales
+FROM vgsales
+WHERE Publisher IN (SELECT Publisher FROM vgsales GROUP BY Publisher ORDER BY SUM(Global_Sales) DESC LIMIT 10)
+GROUP BY Publisher, Genre
+
+--8. Best selling game and publisher per year
+WITH
+Game_results AS(
+SELECT
+	Game,
+	Year,
+	Decade,
+	Game_sales,
+	ROW_NUMBER() OVER(PARTITION BY Decade ORDER BY Year ASC) Orden
+FROM(
+	SELECT
+		*,
+		SUBSTR(Year,1,3)||'0s' Decade,
+		DENSE_RANK() OVER(PARTITION BY Year ORDER BY Game_sales DESC) Ranking
+	FROM(
+		SELECT
+			Name Game,
+			Year,
+			SUM(Global_Sales) Game_sales
+		FROM vgsales
+		WHERE Year IS NOT NULL AND Year<2017
+		GROUP BY Name, Year
+	)
+)
+WHERE Ranking=1
+),
+Publisher_results AS(
+SELECT
+	Publisher,
+	Year,
+	Decade,
+	Publisher_sales,
+	ROW_NUMBER() OVER(PARTITION BY Decade ORDER BY Year ASC) Orden
+FROM(
+	SELECT
+		*,
+		SUBSTR(Year,1,3)||'0s' Decade,
+		DENSE_RANK() OVER(PARTITION BY Year ORDER BY Publisher_sales DESC) Ranking
+	FROM(
+		SELECT
+			Publisher,
+			Year,
+			SUM(Global_sales) Publisher_sales
+		FROM vgsales
+		WHERE Year IS NOT NULL AND Year<2017
+		GROUP BY Publisher, Year
+	)
+)
+WHERE Ranking=1
+)
+SELECT
+	G.Decade,
+	G.Year,
+	G.Orden,
+	G.Game,
+	ROUND(G.Game_sales,2) Game_sales,
+	P.Publisher,
+	ROUND(P.Publisher_sales,2) Publisher_sales
+FROM Game_results G
+INNER JOIN Publisher_results P
+ON G.Year = P.Year
+
+--9. Genres sales throughout the years
+WITH
+Genre_yearly_sales AS(
+	SELECT
+		Genre,
+		Year,
+		ROUND(SUM(Global_sales),2) Total_sales
+	FROM vgsales
+	WHERE Year IS NOT NULL
+	GROUP BY Genre, Year
+),
+Best_selling_game AS(
+SELECT
+	Genre,
+	Year,
+	Game,
+	Game_sales
+FROM
+(
+	SELECT
+		*,
+		RANK() OVER(PARTITION BY Genre, Year ORDER BY Game_sales DESC) Ranking
+	FROM
+	(
+		SELECT
+			Genre,
+			Year,
+			Name Game,
+			SUM(Global_sales) Game_sales
+		FROM vgsales
+		WHERE Year IS NOT NULL
+		GROUP BY Name, Year, Genre
+	)
+)
+WHERE Ranking=1
+)
+SELECT
+	GYS.Genre,
+	GYS.Year,
+	ROUND(GYS.Total_sales,2) Total_sales,
+	BSG.Game,
+	ROUND(BSG.Game_sales,2) Game_sales
+FROM Genre_yearly_sales GYS
+INNER JOIN Best_selling_game BSG
+ON GYS.Genre = BSG.Genre
+AND GYS.Year = BSG.Year
