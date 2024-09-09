@@ -24,7 +24,6 @@ def creating_data(databaseName, file_name, output_path):
         out_file_name += f'{i}.xlsx'
         generate_df(DB, specific_query(file_name,i), out_file_name)
 
-#Main
 if __name__ ==  '__main__':
     DB = 'VideoGame_Sales.db'
     path_file = 'C:\\Users\\Gibran\\Documents\\Videogame sales\\'
