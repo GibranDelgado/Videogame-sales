@@ -212,10 +212,10 @@ FROM(
 )
 WHERE Ranking<=5)
 SELECT
-	IIF(NA.NA_Genre='Misc','Miscellaneous',NA.NA_Genre) NA_Genre, ROUND(NA.NorthAmerica_Sales_Percentage,4) NorthAmerica_Sales_Percentage,
-	IIF(EU.EU_Genre='Misc','Miscellaneous',EU.EU_Genre) EU_Genre, ROUND(EU.Europe_Sales_Percentage,4) Europe_Sales_Percentage,
-	IIF(JP.JP_Genre='Misc','Miscellaneous',JP.JP_Genre) JP_Genre, ROUND(JP.Japan_Sales_Percentage,4) Japan_Sales_Percentage,
-	IIF(OW.OW_Genre='Misc','Miscellaneous',OW.OW_Genre) OW_Genre, ROUND(OW.Other_World_Sales_Percentage,4) Other_World_Sales_Percentage
+	NA_Genre, ROUND(NA.NorthAmerica_Sales_Percentage,4) NorthAmerica_Sales_Percentage,
+	EU_Genre, ROUND(EU.Europe_Sales_Percentage,4) Europe_Sales_Percentage,
+	JP_Genre, ROUND(JP.Japan_Sales_Percentage,4) Japan_Sales_Percentage,
+	OW_Genre, ROUND(OW.Other_World_Sales_Percentage,4) Other_World_Sales_Percentage
 FROM NorthAmerica NA
 INNER JOIN Europe EU
 ON NA.Ranking = EU.Ranking
