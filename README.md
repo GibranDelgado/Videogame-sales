@@ -1,6 +1,5 @@
 # Videogame sales
-Thank you for your interest in my project. This time I decided to use one of the most popular kaggle's dataset which contains information about the best-selling videogames of all times in order to make an  
-exploratory data analysis about how sales were distributed according each year, publisher, genre, region, etc. 
+Thank you for your interest in my project. This time I decided to use one of the most popular kaggle's dataset which contains information about the best-selling videogames of all times in order to make an exploratory data analysis about how sales were distributed according each year, publisher, genre, region, etc. 
 
 ## Content
 The project has two folders:
