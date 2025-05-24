@@ -35,7 +35,6 @@ Execute the "Main.py" script. This going to create a new folder called "Queries_
 These two libraries were used. If you are working in an anaconda environment, you will not need to install anything.
 ```
 pip install pandas
-pip install db-sqlite3
 ```
 
 ## References
