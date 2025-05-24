@@ -32,7 +32,7 @@ Execute the "Main.py" script. This going to create a new folder called "Queries_
   - A similar trend occurs with consoles, as PlayStation 2 and 3, and Xbox 360 are the best-seller in the first three regions mentioned before, but not for Japan, where Nintendo DS dominates the market.
 
 ## Libraries
-These two libraries were used. If you are working in the anaconda environment, you will not need the first one.
+These two libraries were used. If you are working in an anaconda environment, you will not need the first one.
 ```
 pip install pandas
 pip install db-sqlite3
