@@ -9,6 +9,8 @@ See the links below to visualize my dashboard
 - 🔗 Visualize on [NovyPro](https://project.novypro.com/oBJUly)
 - 🔗 Visualize on [Tableau Public](https://public.tableau.com/views/Videogamessales_17254356439930/Dashboard4?:language=es-ES&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)
 
+![image alt](https://github.com/GibranDelgado/Videogame-sales/blob/master/Video%20games%20sales.png?raw=true)
+
 ## 📂 Project Content
 The project is structured into two main directories to separate raw data from processing logic:
 ### 📄 Used Files
