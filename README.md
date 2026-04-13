@@ -6,6 +6,8 @@ See the links below to visualize my dashboard
   - NovyPro: https://project.novypro.com/oBJUly
   - Tableau public: https://public.tableau.com/views/Videogamessales_17254356439930/Dashboard4?:language=es-ES&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
 
+![image alt](https://github.com/GibranDelgado/Videogame-sales/blob/master/Video%20games%20sales.png?raw=true)
+
 ## Content
 The project has two folders
 
