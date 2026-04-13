@@ -37,7 +37,7 @@ A new folder named `Queries_results` will be created, containing the resulting f
 **When adding or modifying a query in the text document, please ensure you follow the existing numbering format to avoid execution errors.**
 
 ## 🧪 Key Insights & Discussion
-- The Nintendo Factor: Nintendo is ranked as the publisher with the highest revenues of all time, despite not having the highest number of releases. The Mario Bros. franchise remains a dominant force in these metrics.
+- **The Nintendo Factor:** Nintendo is ranked as the publisher with the highest revenues of all time, despite not having the highest number of releases. The Mario Bros. franchise remains a dominant force in these metrics.
 - **Console Wars:** PlayStation 2 and 3 are identified as the most successful consoles, leading in both total sales and total releases.
 - **Regional Trends:** NA, EU, and Rest of the World: Action and Sports genres dominate these markets.
 - **Japan:** An interesting exception where Role-Playing (RPG) is the most successful genre and the Nintendo DS is the top-selling console.
